@@ -1,22 +1,26 @@
+from flask import Flask
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import Application, CommandHandler, CallbackContext, CallbackQueryHandler  # CallbackQueryHandler ni import qilamiz
+from telegram.ext import Application, CommandHandler, CallbackContext, CallbackQueryHandler
+import threading
 
-TOKEN = '8164935831:AAFRLKMSIQlsoQUpuXN-3iqC2thQOQCOwr4'  # O'zgartiring
+TOKEN = "SIZNING_BOT_TOKEN"  # Tokeningizni qo‘ying
+
+app = Flask(__name__)
+
+@app.route('/')
+def home():
+    return "Bot ishlayapti!"
 
 async def start(update: Update, context: CallbackContext):
-    # Inline tugmalarni yaratish
     keyboard = [
         [InlineKeyboardButton("👋 Play Game", web_app={"url": "https://qodextoken.onrender.com"})],
-        [InlineKeyboardButton("💪💋 Join Community", url="https://t.me/QODEX_COIN")],  # Telegram kanaliga o'tish
-        [InlineKeyboardButton("🧾 Help", callback_data="help")]  # Help tugmasi
+        [InlineKeyboardButton("💪💋 Join Community", url="https://t.me/QODEX_COIN")],
+        [InlineKeyboardButton("🧾 Help", callback_data="help")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    
-    # Foydalanuvchiga xabar yuborish
     await update.message.reply_text("Welcome! Press the button below to open the Web App.", reply_markup=reply_markup)
 
 async def help(update: Update, context: CallbackContext):
-    # Yordam xabari
     help_text = """
     Explore the complete guide
 
@@ -35,20 +39,16 @@ async def help(update: Update, context: CallbackContext):
     The Purpose:
     Collect as many Shares as possible and exchange them for QODEX.
     """
-    # Yordam xabarini yuborish
     await update.message.reply_text(help_text)
 
-def main():
+def run_bot():
     application = Application.builder().token(TOKEN).build()
-
-    # Command handler qo'shish
     application.add_handler(CommandHandler("start", start))
-
-    # Callback handler qo'shish (Help tugmasi uchun)
     application.add_handler(CallbackQueryHandler(help, pattern="help"))
-
-    # Pollingni ishga tushirish
     application.run_polling()
 
-if __name__ == '__main__':
-    main()
+# Botni alohida oqimda ishga tushiramiz
+threading.Thread(target=run_bot).start()
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=10000)
