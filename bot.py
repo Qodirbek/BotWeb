@@ -3,7 +3,7 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, CallbackContext, CallbackQueryHandler
 import threading
 
-TOKEN = "SIZNING_BOT_TOKEN"  # Tokeningizni qo‘ying
+TOKEN = "8164935831:AAFRLKMSIQlsoQUpuXN-3iqC2thQOQCOwr4"  # Tokeningizni qo‘ying
 
 app = Flask(__name__)
 
