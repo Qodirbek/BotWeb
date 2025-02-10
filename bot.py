@@ -3,24 +3,24 @@ import firebase_admin
 from firebase_admin import credentials, firestore
 from aiogram import Bot, Dispatcher, types
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from aiogram.utils import executor
+from aiogram.utils.executor import start_polling
+from flask import Flask
+import threading
+import os
+
+# 🔹 Render uchun Flask server
+app = Flask(__name__)
+
+@app.route('/')
+def home():
+    return "Bot is running!"
 
 # 🔹 Bot tokeni
-BOT_TOKEN = "8164935831:AAG10smeIKZd30DuABSDc_f5sxshvVoFpmg"
+BOT_TOKEN = os.getenv("BOT_TOKEN", "8164935831:AAG10smeIKZd30DuABSDc_f5sxshvVoFpmg")
 
-# 🔹 Firebase sozlamalari (Agar kerak bo‘lsa)
-FIREBASE_CONFIG = {
-    "apiKey": "AIzaSyCKWeAIWQcrZlb5toflCu2cll186_HtQPs",
-    "authDomain": "qodextoken.firebaseapp.com",
-    "projectId": "qodextoken",
-    "storageBucket": "qodextoken.firebasestorage.app",
-    "messagingSenderId": "582834983319",
-    "appId": "1:582834983319:web:526c99d58290264906b4d2"
-}
-
-# 🔹 Firebase ulash (Agar kerak bo‘lsa)
+# 🔹 Firebase sozlamalari
 if not firebase_admin._apps:
-    cred = credentials.Certificate("firebase-adminsdk.json")  # Faylni yuklash
+    cred = credentials.Certificate("firebase-adminsdk.json")  # Firebase faylini yuklash
     firebase_admin.initialize_app(cred)
 db = firestore.client()
 
@@ -33,13 +33,11 @@ dp = Dispatcher(bot)
 async def start_command(message: types.Message):
     keyboard = InlineKeyboardMarkup()
 
-    # 👋 Play Game tugmasi (Web App)
     play_game_button = InlineKeyboardButton(
         text="👋 Play Game", 
-        web_app=types.WebAppInfo(url="https://qodextoken-token.vercel.app")  # SAYT MANZILI
+        web_app=types.WebAppInfo(url="https://qodextoken-token.vercel.app")
     )
 
-    # 💪💋 Join Community tugmasi (Telegram kanalga o'tish)
     join_community_button = InlineKeyboardButton(
         text="💪💋 Join Community", 
         url="https://t.me/QODEX_COIN"
@@ -50,7 +48,12 @@ async def start_command(message: types.Message):
 
     await message.reply("👋 Salom! O‘yin yoki jamiyatga qo‘shiling!", reply_markup=keyboard)
 
-# 🔹 Botni ishga tushirish
-if __name__ == '__main__':
+# 🔹 Botni alohida thread'da ishga tushirish
+def run_bot():
     logging.basicConfig(level=logging.INFO)
-    executor.start_polling(dp, skip_updates=True)
+    start_polling(dp, skip_updates=True)
+
+threading.Thread(target=run_bot).start()
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
