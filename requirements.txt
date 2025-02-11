@@ -1,4 +1,6 @@
-aiogram
-firebase-admin
-flask
-gunicorn
+Flask==2.2.3
+Flask-Cors==3.1.1
+Flask-SQLAlchemy==3.0.3
+firebase-admin==6.0.0
+requests==2.28.1
+python-dotenv==0.21.0
